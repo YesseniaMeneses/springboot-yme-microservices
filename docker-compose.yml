@@ -1,0 +1,89 @@
+version: '3'
+services:
+    client-server:
+        build:
+            context: client-service
+            dockerfile: Dockerfile
+        image: client-server:latest
+        ports:
+            - 8888:8888
+        depends_on:
+            appdb:
+                condition: service_healthy
+            rabbitmq:
+                condition: service_started
+        env_file: .env
+        environment:
+            - SPRING_DATASOURCE_URL=jdbc:mysql://appdb:${PORT}/${DATABASE}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+            - SPRING_DATASOURCE_USERNAME=${USER}
+            - SPRING_DATASOURCE_PASSWORD=${PASSWORD}
+            - SPRING_DATASOURCE_INITIALIZATION_MODE=always
+            - SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT=60000
+            - SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=5
+            - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQLDialect
+            - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+            - SPRING_RABBITMQ_HOST=rabbitmq
+        networks:
+            - client
+    movements-server:
+        build:
+            context: movements-service
+            dockerfile: Dockerfile
+        image: movements-server:latest
+        ports:
+            - 9999:9999
+        depends_on:
+            appdb:
+                condition: service_healthy
+            rabbitmq:
+                condition: service_started
+        env_file: .env
+        environment:
+            - SPRING_DATASOURCE_URL=jdbc:mysql://appdb:${PORT}/${DATABASE}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+            - SPRING_DATASOURCE_USERNAME=${USER}
+            - SPRING_DATASOURCE_PASSWORD=${PASSWORD}
+            - SPRING_DATASOURCE_INITIALIZATION_MODE=always
+            - SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT=60000
+            - SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=5
+            - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQLDialect
+            - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+            - SPRING_RABBITMQ_HOST=rabbitmq
+        networks:
+            - movements
+    appdb:
+        image: mysql:8.0.33
+        restart: unless-stopped
+        env_file: .env
+        environment:
+            - MYSQL_DATABASE=${DATABASE}
+            - MYSQL_USER=${USER}
+            - MYSQL_ROOT_PASSWORD=${ROOT_PASSWORD}
+            - MYSQL_PASSWORD=${PASSWORD}
+        ports:
+            - ${PORT}:${PORT}
+        volumes:
+            - appdb-data:/var/lib/mysql
+        networks:
+            - client
+            - movements
+        healthcheck:
+            test: [ "CMD", "mysqladmin" ,"ping", "-h", "appdb" ]
+            retries: 10
+            interval: 3s
+            timeout: 30s
+    rabbitmq:
+        image: rabbitmq:management
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        volumes:
+            - rabbitmq-data:/var/lib/rabbitmq/
+        networks:
+            - client
+            - movements
+networks:
+    client:
+    movements:
+volumes:
+    appdb-data:
+    rabbitmq-data:
