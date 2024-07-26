@@ -8,6 +8,7 @@ import com.yme.movementsservice.constant.ErrorMessages;
 import com.yme.movementsservice.entity.Account;
 import com.yme.movementsservice.entity.Client;
 import com.yme.movementsservice.entity.Movement;
+import com.yme.movementsservice.enums.AccountType;
 import com.yme.movementsservice.exception.BusinessException;
 import com.yme.movementsservice.domain.MovementDetail;
 import com.yme.movementsservice.domain.MovementsByAccount;
@@ -60,7 +61,7 @@ class ReportServiceTest extends BaseTest {
     private void saveAccount(String accountNumber) {
         clientRepository.save(client);
         Account account = new Account();
-        account.setAccountType(AHO);
+        account.setAccountType(AccountType.AHO);
         account.setAccountNumber(accountNumber);
         Account savedAccount = accountService.saveAccount(CLIENT_ID, account);
         Assertions.assertNotNull(savedAccount);

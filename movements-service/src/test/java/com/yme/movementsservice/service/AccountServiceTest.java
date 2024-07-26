@@ -6,6 +6,7 @@ import com.yme.movementsservice.BaseTest;
 import com.yme.movementsservice.constant.ErrorMessages;
 import com.yme.movementsservice.entity.Account;
 import com.yme.movementsservice.entity.Client;
+import com.yme.movementsservice.enums.AccountType;
 import com.yme.movementsservice.exception.ResourceAlreadyExistsException;
 import com.yme.movementsservice.exception.ResourceNotFoundException;
 import com.yme.movementsservice.repository.ClientRepository;
@@ -76,9 +77,9 @@ class AccountServiceTest extends BaseTest {
         Account savedAccount = accountService.saveAccount(insertedClient.getClientId(), account);
         Assertions.assertNotNull(savedAccount);
         Assertions.assertEquals(ACCOUNT_NUMBER, savedAccount.getAccountNumber());
-        savedAccount.setAccountType(COR);
+        savedAccount.setAccountType(AccountType.COR);
         Account updatedAccount = accountService.updateAccount(insertedClient.getClientId(), savedAccount);
-        Assertions.assertEquals(COR, updatedAccount.getAccountType());
+        Assertions.assertEquals(AccountType.COR, updatedAccount.getAccountType());
     }
 
     @Transactional

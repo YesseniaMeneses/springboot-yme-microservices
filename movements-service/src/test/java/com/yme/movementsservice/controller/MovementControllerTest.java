@@ -7,6 +7,7 @@ import com.yme.movementsservice.constant.Constant;
 import com.yme.movementsservice.entity.Account;
 import com.yme.movementsservice.entity.Client;
 import com.yme.movementsservice.entity.Movement;
+import com.yme.movementsservice.enums.AccountType;
 import com.yme.movementsservice.repository.ClientRepository;
 import com.yme.movementsservice.service.AccountService;
 import org.junit.jupiter.api.Assertions;
@@ -55,7 +56,7 @@ class MovementControllerTest extends BaseTest {
         Client savedClient = clientRepository.save(client);
 
         Account account = new Account();
-        account.setAccountType(AHO);
+        account.setAccountType(AccountType.AHO);
         account.setAccountNumber(accountNumber);
         account.setClient(savedClient);
         accountService.saveAccount(clientId, account);

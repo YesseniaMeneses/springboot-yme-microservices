@@ -113,7 +113,7 @@ public class ReportServiceImpl implements ReportService {
         AccountDetail accountDetailReport = new AccountDetail();
         accountDetailReport.setClientName(client.getName());
         accountDetailReport.setAccountNumber(account.getAccountNumber());
-        accountDetailReport.setAccountType(account.getAccountType());
+        accountDetailReport.setAccountType(account.getAccountType().name());
         accountDetailReport.setStatus(account.getStatus());
         accountDetailReport.setInitialBalance(account.getInitialBalance());
         accountDetailReport.setFinalBalance(account.getFinalBalance());

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yme.movementsservice.BaseTest;
 import com.yme.movementsservice.entity.Account;
 import com.yme.movementsservice.entity.Client;
+import com.yme.movementsservice.enums.AccountType;
 import com.yme.movementsservice.repository.ClientRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +47,7 @@ class AccountControllerTest extends BaseTest {
         client.setIdentification(String.valueOf(new Random().nextInt()));
         Client savedClient = clientRepository.save(client);
         Account account = new Account();
-        account.setAccountType(AHO);
+        account.setAccountType(AccountType.AHO);
         account.setAccountNumber(accountNumber);
         account.setClient(savedClient);
         return account;
@@ -71,13 +72,13 @@ class AccountControllerTest extends BaseTest {
         ResponseEntity<Account> response = accountController.saveAccount(clientId, prepareAccountData(clientId, accountNumber));
         Account savedAccount = response.getBody();
         Assertions.assertNotNull(savedAccount);
-        savedAccount.setAccountType(COR);
+        savedAccount.setAccountType(AccountType.COR);
 
         response = accountController.updateAccount(clientId, savedAccount);
         Assertions.assertNotNull(response);
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertInstanceOf(Account.class, response.getBody());
-        Assertions.assertEquals(COR, response.getBody().getAccountType());
+        Assertions.assertEquals(AccountType.COR, response.getBody().getAccountType());
     }
 
     @Test

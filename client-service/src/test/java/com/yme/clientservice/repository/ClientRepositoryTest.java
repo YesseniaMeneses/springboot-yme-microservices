@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yme.clientservice.BaseTest;
 import com.yme.clientservice.entity.Client;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Random;
+
+import static org.junit.Assert.assertThrows;
 
 public class ClientRepositoryTest extends BaseTest {
 
@@ -25,7 +28,8 @@ public class ClientRepositoryTest extends BaseTest {
                 "    \"name\": \"YESSENIA MENESES\",\n" +
                 "    \"address\": \"Vicente Paredes N3-154 y Francisco Guarderas\",\n" +
                 "    \"phoneNumber\": \"0980000000\",\n" +
-                "    \"password\": \"00000\"\n" +
+                "    \"password\": \"00000\",\n" +
+                "    \"gender\": \"F\"\n" +
                 "}";
 
         try {
@@ -43,8 +47,23 @@ public class ClientRepositoryTest extends BaseTest {
         String identification = String.valueOf(new Random().nextInt(Integer.SIZE - 1) + 1237777777);
         client.setClientId(clientId);
         client.setIdentification(identification);
+        client.setAge(31);
         clientRepository.save(client);
         Client clientInserted = clientRepository.findByClientId(clientId);
         Assertions.assertNotNull(clientInserted);
+    }
+
+    @Transactional
+    @Test
+    public void givenNoAgeWheninsertClientShouldThrowConstraintViolationException() {
+        Long clientId = new Random().nextLong();
+        String identification = String.valueOf(new Random().nextInt(Integer.SIZE - 1) + 1237777777);
+        client.setClientId(clientId);
+        client.setIdentification(identification);
+        client.setAge(null);
+
+        ConstraintViolationException exception = assertThrows(ConstraintViolationException.class, () ->
+                clientRepository.save(client));
+        Assertions.assertNotNull(exception.getMessage());
     }
 }

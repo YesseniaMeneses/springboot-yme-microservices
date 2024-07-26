@@ -1,7 +1,9 @@
 package com.yme.movementsservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.yme.movementsservice.enums.AccountType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -22,8 +24,10 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(unique = true)
+    @NotBlank(message = "El número de cuenta no puede estar vacío.")
     private String accountNumber;
-    private String accountType;
+    @Enumerated(value = EnumType.STRING)
+    private AccountType accountType;
     private BigDecimal initialBalance = BigDecimal.valueOf(0.00);
     private BigDecimal finalBalance = BigDecimal.valueOf(0.00);
     private Boolean status = true;

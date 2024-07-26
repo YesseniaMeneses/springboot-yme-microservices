@@ -2,6 +2,7 @@ package com.yme.movementsservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -24,6 +25,7 @@ public class Movement {
     private Long id;
     private Date date;
     @Column(nullable = false)
+    @NotNull(message = "El tipo de movimiento no puede estar vacío.")
     private Character type;
     @Column(nullable = false)
     private BigDecimal amount;

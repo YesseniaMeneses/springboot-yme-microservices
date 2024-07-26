@@ -19,4 +19,5 @@ public class ErrorMessages {
 
     //DATA INTEGRITY
     public static final String ERROR_DATA_INTEGRITY_VIOLATION = "No se pudo realizar la operación. Existen violaciones a la integridad de la data.";
+    public static final String ERROR_ENUM_DATA = "Valor inválido: '%s' para el campo: '%s'. Debe ser uno de los siguientes: %s.";
 }

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ed484646-0f91-407b-9f8e-8f3670fea8ba",
+		"_postman_id": "c1e90eb2-1ace-4264-9610-bf1929771169",
 		"name": "ClientService",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "3558181"
@@ -18,7 +18,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"identification\": \"1234567890\",\n    \"clientId\": 123,\n    \"name\": \"YESSENIA MENESES\",\n    \"address\": \"Vicente Paredes N0-000 y Francisco Guarderas\",\n    \"phoneNumber\": \"0980000000\",\n    \"password\": \"00000\"\n}",
+					"raw": "{\n    \"identification\": \"1234567890\",\n    \"clientId\": 123,\n    \"name\": \"YESSENIA MENESES\",\n    \"address\": \"Vicente Paredes N0-000 y Francisco Guarderas\",\n    \"phoneNumber\": \"0980000000\",\n    \"password\": \"00000\",\n    //\"gender\":\"F\",\n    \"age\":1\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -87,7 +87,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"id\": 1,\n    \"identification\": \"1234567890\",\n    \"name\": \"YESSENIA MENESES\",\n    \"gender\": \"F\",\n    \"age\": 31,\n    \"address\": \"Vicente Paredes N0-000 y Francisco Guarderas\",\n    \"phoneNumber\": \"0980000000\",\n    \"clientId\": 123,\n    \"password\": \"00000\",\n    \"status\": true\n}",
+					"raw": "{\n    \"id\": 1,\n    \"identification\": \"1234567890\",\n    \"name\": \"YESSENIA MENESES\",\n    \"gender\": \"F\",\n    \"age\": 31,\n    \"address\": \"Vicente Paredes N0-000 y Francisco Guarderas\",\n    \"phoneNumber\": \"0980000000\",\n    \"clientId\": 123,\n    \"password\": \"00000\",\n    \"status\": false\n}",
 					"options": {
 						"raw": {
 							"language": "json"
