@@ -1,4 +1,4 @@
-package com.yme.clientservice.domain;
+package com.yme.clientservice.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;

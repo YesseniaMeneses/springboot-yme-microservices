@@ -3,7 +3,7 @@ package com.yme.clientservice.repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yme.clientservice.BaseTest;
-import com.yme.clientservice.entity.Client;
+import com.yme.clientservice.entity.ClientEntity;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertThrows;
 public class ClientRepositoryTest extends BaseTest {
 
     @Autowired ClientRepository clientRepository;
-    static Client client;
+    static ClientEntity clientEntity;
 
     @BeforeAll
     public static void init() {
@@ -34,7 +34,7 @@ public class ClientRepositoryTest extends BaseTest {
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            client = objectMapper.readValue(jsonData, Client.class);
+            clientEntity = objectMapper.readValue(jsonData, ClientEntity.class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -42,28 +42,28 @@ public class ClientRepositoryTest extends BaseTest {
 
     @Transactional
     @Test
-    public void insertClient() {
+    void insertClient() {
         Long clientId = new Random().nextLong();
         String identification = String.valueOf(new Random().nextInt(Integer.SIZE - 1) + 1237777777);
-        client.setClientId(clientId);
-        client.setIdentification(identification);
-        client.setAge(31);
-        clientRepository.save(client);
-        Client clientInserted = clientRepository.findByClientId(clientId);
-        Assertions.assertNotNull(clientInserted);
+        clientEntity.setClientId(clientId);
+        clientEntity.setIdentification(identification);
+        clientEntity.setAge(31);
+        clientRepository.save(clientEntity);
+        ClientEntity clientEntityInserted = clientRepository.findByClientId(clientId);
+        Assertions.assertNotNull(clientEntityInserted);
     }
 
     @Transactional
     @Test
-    public void givenNoAgeWheninsertClientShouldThrowConstraintViolationException() {
+    void givenNoAgeWhenInsertClientShouldThrowConstraintViolationException() {
         Long clientId = new Random().nextLong();
         String identification = String.valueOf(new Random().nextInt(Integer.SIZE - 1) + 1237777777);
-        client.setClientId(clientId);
-        client.setIdentification(identification);
-        client.setAge(null);
+        clientEntity.setClientId(clientId);
+        clientEntity.setIdentification(identification);
+        clientEntity.setAge(null);
 
         ConstraintViolationException exception = assertThrows(ConstraintViolationException.class, () ->
-                clientRepository.save(client));
+                clientRepository.save(clientEntity));
         Assertions.assertNotNull(exception.getMessage());
     }
 }

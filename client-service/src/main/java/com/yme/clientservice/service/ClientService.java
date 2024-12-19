@@ -2,7 +2,8 @@ package com.yme.clientservice.service;
 
 
 
-import com.yme.clientservice.entity.Client;
+import com.yme.clientservice.domain.Client;
+import com.yme.clientservice.entity.ClientEntity;
 
 import java.util.List;
 

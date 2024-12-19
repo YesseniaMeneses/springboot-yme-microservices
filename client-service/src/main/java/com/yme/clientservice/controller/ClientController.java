@@ -1,6 +1,7 @@
 package com.yme.clientservice.controller;
 
-import com.yme.clientservice.entity.Client;
+import com.yme.clientservice.domain.Client;
+import com.yme.clientservice.entity.ClientEntity;
 import com.yme.clientservice.service.ClientService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,10 +1,10 @@
 package com.yme.clientservice.entity;
 
-import com.yme.clientservice.domain.Person;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +18,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Setter
 @Getter
-public class Client extends Person {
+@Builder
+public class ClientEntity extends Person {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

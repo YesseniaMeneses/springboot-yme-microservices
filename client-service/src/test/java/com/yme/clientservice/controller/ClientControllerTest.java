@@ -1,6 +1,7 @@
 package com.yme.clientservice.controller;
 
-import com.yme.clientservice.entity.Client;
+import com.yme.clientservice.domain.Client;
+import com.yme.clientservice.mapper.ClientMapper;
 import com.yme.clientservice.service.ClientService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,11 +25,14 @@ public class ClientControllerTest {
 
     @InjectMocks private ClientController clientController;
     @Mock private ClientService clientService;
+    @Mock private ClientMapper clientMapper;
+
+    private static final Long ID = 123L;
 
     @Test
     public void saveClient() {
-        Client client = new Client();
-        client.setClientId(123L);
+        var client = Client.builder().clientId(ID).build();
+
         when(clientService.saveClient(any(Client.class))).thenReturn(client);
 
         ResponseEntity<Client> response = clientController.saveClient(client);
@@ -39,20 +43,19 @@ public class ClientControllerTest {
 
     @Test
     public void updateClient() {
-        Client client = new Client();
-        client.setClientId(123L);
+        var client = Client.builder().clientId(ID).build();
         when(clientService.updateClient(any(Client.class))).thenReturn(client);
 
         ResponseEntity<Client> response = clientController.updateClient(client);
         assertThat(response.getStatusCode()).isSameAs(HttpStatus.OK);
-        assertThat(Objects.requireNonNull(response.getBody()).getClientId()).isEqualTo(123L);
+        assertThat(Objects.requireNonNull(response.getBody()).getClientId()).isEqualTo(ID);
         verify(clientService).updateClient(client);
     }
 
     @Test
     public void getAllClients() {
-        List<Client> clients = new ArrayList<>();
-        when(clientService.getAllClients()).thenReturn(clients);
+        List<Client> clientEntities = new ArrayList<>();
+        when(clientService.getAllClients()).thenReturn(clientEntities);
 
         ResponseEntity<List<Client>> response = clientController.getAllClients();
         assertThat(response.getStatusCode()).isSameAs(HttpStatus.OK);
@@ -62,19 +65,18 @@ public class ClientControllerTest {
 
     @Test
     public void getClientByClientId() {
-        Client client = new Client();
-        client.setClientId(123L);
+        var client = Client.builder().clientId(ID).build();
         when(clientService.getClientByClientId(any())).thenReturn(client);
 
-        ResponseEntity<Client> response = clientController.getClientByClientId(123L);
+        ResponseEntity<Client> response = clientController.getClientByClientId(ID);
         assertThat(response.getStatusCode()).isSameAs(HttpStatus.OK);
-        assertThat(Objects.requireNonNull(response.getBody()).getClientId()).isEqualTo(123L);
-        verify(clientService).getClientByClientId(123L);
+        assertThat(Objects.requireNonNull(response.getBody()).getClientId()).isEqualTo(ID);
+        verify(clientService).getClientByClientId(ID);
     }
 
     @Test
     public void deleteClientByClientId() {
-        clientController.deleteClientByClientId(123L);
-        verify(clientService).deleteClientByClientId(123L);
+        clientController.deleteClientByClientId(ID);
+        verify(clientService).deleteClientByClientId(ID);
     }
 }
