@@ -1,7 +1,8 @@
 package com.yme.movementsservice.validation;
 
-import com.yme.movementsservice.constant.ErrorMessages;
-import com.yme.movementsservice.exception.BusinessException;
+import com.yme.movementsservice.infraestructure.util.ErrorMessages;
+import com.yme.movementsservice.infraestructure.input.adapter.rest.exception.BusinessException;
+import com.yme.movementsservice.infraestructure.util.validation.Date;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

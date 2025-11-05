@@ -3,7 +3,8 @@ package com.yme.clientservice.repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yme.clientservice.BaseTest;
-import com.yme.clientservice.entity.ClientEntity;
+import com.yme.clientservice.infraestructure.output.adapter.repository.ClientRepository;
+import com.yme.clientservice.infraestructure.output.adapter.repository.entity.ClientEntity;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,7 +18,8 @@ import static org.junit.Assert.assertThrows;
 
 public class ClientRepositoryTest extends BaseTest {
 
-    @Autowired ClientRepository clientRepository;
+    @Autowired
+    ClientRepository clientRepository;
     static ClientEntity clientEntity;
 
     @BeforeAll

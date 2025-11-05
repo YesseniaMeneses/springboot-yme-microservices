@@ -1,10 +1,10 @@
 package com.yme.clientservice.service;
 
+import com.yme.clientservice.application.service.ClientServiceImpl;
 import com.yme.clientservice.domain.Client;
-import com.yme.clientservice.entity.ClientEntity;
-import com.yme.clientservice.mapper.ClientMapper;
-import com.yme.clientservice.repository.ClientRepository;
-import com.yme.clientservice.service.impl.ClientServiceImpl;
+import com.yme.clientservice.infraestructure.output.adapter.mapper.ClientMapper;
+import com.yme.clientservice.infraestructure.output.adapter.repository.ClientRepository;
+import com.yme.clientservice.infraestructure.output.adapter.repository.entity.ClientEntity;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -52,7 +52,7 @@ public class ClientServiceTest {
         when(clientMapper.toClientEntity(any(Client.class))).thenReturn(clientEntity);
 
         Client updatedClientEntity = clientService.updateClient(client);
-        assertThat(updatedClientEntity.getStatus()).isFalse();
+        assertThat(updatedClientEntity.getStatus()).isSameAs(Boolean.FALSE);
     }
 
     @Test

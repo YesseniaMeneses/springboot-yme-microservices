@@ -2,7 +2,8 @@ package com.yme.movementsservice.controller;
 
 import com.yme.movementsservice.BaseTest;
 import com.yme.movementsservice.domain.MovementsByAccount;
-import com.yme.movementsservice.service.ReportService;
+import com.yme.movementsservice.application.input.port.ReportService;
+import com.yme.movementsservice.infraestructure.input.adapter.rest.impl.ReportController;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;

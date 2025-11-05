@@ -1,13 +1,13 @@
 package com.yme.clientservice.controller;
 
+import com.yme.clientservice.application.input.port.ClientService;
 import com.yme.clientservice.domain.Client;
-import com.yme.clientservice.mapper.ClientMapper;
-import com.yme.clientservice.service.ClientService;
+import com.yme.clientservice.infraestructure.input.adapter.rest.impl.ClientController;
+import com.yme.clientservice.infraestructure.output.adapter.mapper.ClientMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,7 +38,7 @@ public class ClientControllerTest {
 
         ResponseEntity<Client> response = clientController.saveClient(client);
         assertThat(response.getStatusCode()).isSameAs(HttpStatus.CREATED);
-        assertThat(Objects.requireNonNull(response.getBody()).getClientId()).isEqualTo(123L);
+        assertThat(Objects.requireNonNull(response.getBody().getClientId())).isEqualTo(123L);
         verify(clientService).saveClient(client);
     }
 
@@ -48,7 +49,7 @@ public class ClientControllerTest {
 
         ResponseEntity<Client> response = clientController.updateClient(client);
         assertThat(response.getStatusCode()).isSameAs(HttpStatus.OK);
-        assertThat(Objects.requireNonNull(response.getBody()).getClientId()).isEqualTo(ID);
+        assertThat(Objects.requireNonNull(response.getBody().getClientId())).isEqualTo(ID);
         verify(clientService).updateClient(client);
     }
 
@@ -70,7 +71,7 @@ public class ClientControllerTest {
 
         ResponseEntity<Client> response = clientController.getClientByClientId(ID);
         assertThat(response.getStatusCode()).isSameAs(HttpStatus.OK);
-        assertThat(Objects.requireNonNull(response.getBody()).getClientId()).isEqualTo(ID);
+        assertThat(Objects.requireNonNull(response.getBody().getClientId())).isEqualTo(ID);
         verify(clientService).getClientByClientId(ID);
     }
 
