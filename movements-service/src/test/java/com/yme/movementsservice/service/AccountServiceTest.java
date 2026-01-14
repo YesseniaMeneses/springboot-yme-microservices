@@ -4,18 +4,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yme.movementsservice.BaseTest;
 import com.yme.movementsservice.application.input.port.AccountService;
-import com.yme.movementsservice.infraestructure.util.ErrorMessages;
-import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Account;
-import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Client;
 import com.yme.movementsservice.domain.enums.AccountType;
 import com.yme.movementsservice.infraestructure.input.adapter.rest.exception.ResourceAlreadyExistsException;
 import com.yme.movementsservice.infraestructure.input.adapter.rest.exception.ResourceNotFoundException;
 import com.yme.movementsservice.infraestructure.output.adapter.repository.ClientRepository;
+import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Account;
+import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Client;
+import com.yme.movementsservice.infraestructure.util.ErrorMessages;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -63,9 +64,9 @@ class AccountServiceTest extends BaseTest {
         Assertions.assertNotNull(insertedClient);
         Assertions.assertEquals(CLIENT_ID, insertedClient.getClientId());
 
-        Account savedAccount = accountService.saveAccount(insertedClient.getClientId(), account);
+        Mono<Account> savedAccount = accountService.saveAccount(insertedClient.getClientId(), account);
         Assertions.assertNotNull(savedAccount);
-        Assertions.assertEquals(ACCOUNT_NUMBER, savedAccount.getAccountNumber());
+        Assertions.assertEquals(ACCOUNT_NUMBER, savedAccount.map(Account::getAccountNumber));
     }
 
     @Transactional
@@ -75,18 +76,21 @@ class AccountServiceTest extends BaseTest {
         Assertions.assertNotNull(insertedClient);
         Assertions.assertEquals(CLIENT_ID, insertedClient.getClientId());
 
-        Account savedAccount = accountService.saveAccount(insertedClient.getClientId(), account);
+        Mono<Account> savedAccount = accountService.saveAccount(insertedClient.getClientId(), account);
         Assertions.assertNotNull(savedAccount);
-        Assertions.assertEquals(ACCOUNT_NUMBER, savedAccount.getAccountNumber());
-        savedAccount.setAccountType(AccountType.COR);
-        Account updatedAccount = accountService.updateAccount(insertedClient.getClientId(), savedAccount);
-        Assertions.assertEquals(AccountType.COR, updatedAccount.getAccountType());
+        Assertions.assertEquals(ACCOUNT_NUMBER, savedAccount.map(Account::getAccountNumber));
+
+        Mono<Account> updatedAccount = savedAccount.flatMap(acc -> {
+            acc.setAccountType(AccountType.COR);
+            return accountService.updateAccount(insertedClient.getClientId(), acc);
+        });
+        Assertions.assertEquals(AccountType.COR, updatedAccount.map(Account::getAccountType));
     }
 
     @Transactional
     @Test
     void getAllAccounts() {
-        List<Account> accounts = accountService.getAllAccounts();
+        Mono<List<Account>> accounts = accountService.getAllAccounts();
         Assertions.assertNotNull(accounts);
     }
 
@@ -97,12 +101,12 @@ class AccountServiceTest extends BaseTest {
         Assertions.assertNotNull(insertedClient);
         Assertions.assertEquals(CLIENT_ID, insertedClient.getClientId());
 
-        Account savedAccount = accountService.saveAccount(insertedClient.getClientId(), account);
+        Mono<Account> savedAccount = accountService.saveAccount(insertedClient.getClientId(), account);
         Assertions.assertNotNull(savedAccount);
-        Assertions.assertEquals(ACCOUNT_NUMBER, savedAccount.getAccountNumber());
+        Assertions.assertEquals(ACCOUNT_NUMBER, savedAccount.map(Account::getAccountNumber));
 
-        Boolean deletedAccount = accountService.deleteAccountByAccountNumber(savedAccount.getAccountNumber());
-        Assertions.assertTrue(deletedAccount);
+        Mono<Boolean> deletedAccount = accountService.deleteAccountByAccountNumber(savedAccount.map(Account::getAccountNumber).block());
+        Assertions.assertTrue(deletedAccount.block());
     }
 
     @Transactional
@@ -112,11 +116,11 @@ class AccountServiceTest extends BaseTest {
         Assertions.assertNotNull(insertedClient);
         Assertions.assertEquals(CLIENT_ID, insertedClient.getClientId());
 
-        Account savedAccount = accountService.saveAccount(insertedClient.getClientId(), account);
+        Mono<Account> savedAccount = accountService.saveAccount(insertedClient.getClientId(), account);
         Assertions.assertNotNull(savedAccount);
-        Assertions.assertEquals(ACCOUNT_NUMBER, savedAccount.getAccountNumber());
+        Assertions.assertEquals(ACCOUNT_NUMBER, savedAccount.map(Account::getAccountNumber));
 
-        Account foundAccount = accountService.getAccountByAccountNumber(ACCOUNT_NUMBER);
+        Mono<Account> foundAccount = accountService.getAccountByAccountNumber(ACCOUNT_NUMBER);
         Assertions.assertNotNull(foundAccount);
     }
 
@@ -124,9 +128,9 @@ class AccountServiceTest extends BaseTest {
     @Test
     void givenExistingAccountWhenSaveSameAccountShouldThrowERROR_ACCOUNT_ALREADY_EXISTS() {
         Client insertedClient = clientRepository.save(client);
-        Account savedAccount = accountService.saveAccount(insertedClient.getClientId(), account);
+        Mono<Account> savedAccount = accountService.saveAccount(insertedClient.getClientId(), account);
         Assertions.assertNotNull(savedAccount);
-        Assertions.assertEquals(ACCOUNT_NUMBER, savedAccount.getAccountNumber());
+        Assertions.assertEquals(ACCOUNT_NUMBER, savedAccount.map(Account::getAccountNumber));
 
         ResourceAlreadyExistsException exception = assertThrows(ResourceAlreadyExistsException.class, () ->
                 accountService.saveAccount(insertedClient.getClientId(), account));
@@ -156,9 +160,9 @@ class AccountServiceTest extends BaseTest {
         Assertions.assertNotNull(insertedClient);
         Assertions.assertEquals(CLIENT_ID, insertedClient.getClientId());
 
-        Account savedAccount = accountService.saveAccount(insertedClient.getClientId(), account);
+        Mono<Account> savedAccount = accountService.saveAccount(insertedClient.getClientId(), account);
         Assertions.assertNotNull(savedAccount);
-        Assertions.assertEquals(ACCOUNT_NUMBER, savedAccount.getAccountNumber());
+        Assertions.assertEquals(ACCOUNT_NUMBER, savedAccount.map(Account::getAccountNumber));
 
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->
                 accountService.getAccountByAccountNumber(ACCOUNT_NUMBER_2));

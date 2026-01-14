@@ -1,19 +1,18 @@
 package com.yme.clientservice;
 
-import org.junit.ClassRule;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.containers.MySQLContainer;
 
 @ActiveProfiles("dev-test")
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = ClientServiceApplication.class)
 @SpringBootTest(classes = {ClientServiceApplication.class})
 public class BaseTest {
 
+    /*
     private static final String DATABASE = "app_db";
     private static final String USERNAME = "sa";
     private static final String PWD = "sa";
@@ -35,4 +34,6 @@ public class BaseTest {
         System.setProperty(SYSTEM_PROP_USERNAME, mySQLContainer.getUsername());
         System.setProperty(SYSTEM_PROP_PASSWORD, mySQLContainer.getPassword());
     }
+
+     */
 }

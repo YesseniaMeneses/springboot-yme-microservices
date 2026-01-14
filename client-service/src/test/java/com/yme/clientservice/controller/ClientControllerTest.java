@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,31 +35,31 @@ public class ClientControllerTest {
     public void saveClient() {
         var client = Client.builder().clientId(ID).build();
 
-        when(clientService.saveClient(any(Client.class))).thenReturn(client);
+        when(clientService.saveClient(any(Client.class))).thenReturn(Mono.just(client));
 
-        ResponseEntity<Client> response = clientController.saveClient(client);
+        ResponseEntity<Mono<Client>> response = clientController.saveClient(client);
         assertThat(response.getStatusCode()).isSameAs(HttpStatus.CREATED);
-        assertThat(Objects.requireNonNull(response.getBody().getClientId())).isEqualTo(123L);
+        assertThat(Objects.requireNonNull(response.getBody().map(Client::getClientId))).isEqualTo(123L);
         verify(clientService).saveClient(client);
     }
 
     @Test
     public void updateClient() {
         var client = Client.builder().clientId(ID).build();
-        when(clientService.updateClient(any(Client.class))).thenReturn(client);
+        when(clientService.updateClient(any(Client.class))).thenReturn(Mono.just(client));
 
-        ResponseEntity<Client> response = clientController.updateClient(client);
+        ResponseEntity<Mono<Client>> response = clientController.updateClient(client);
         assertThat(response.getStatusCode()).isSameAs(HttpStatus.OK);
-        assertThat(Objects.requireNonNull(response.getBody().getClientId())).isEqualTo(ID);
+        assertThat(Objects.requireNonNull(response.getBody().map(Client::getClientId))).isEqualTo(ID);
         verify(clientService).updateClient(client);
     }
 
     @Test
     public void getAllClients() {
         List<Client> clientEntities = new ArrayList<>();
-        when(clientService.getAllClients()).thenReturn(clientEntities);
+        when(clientService.getAllClients()).thenReturn(Mono.just(clientEntities));
 
-        ResponseEntity<List<Client>> response = clientController.getAllClients();
+        ResponseEntity<Mono<List<Client>>> response = clientController.getAllClients();
         assertThat(response.getStatusCode()).isSameAs(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         verify(clientService).getAllClients();
@@ -67,11 +68,11 @@ public class ClientControllerTest {
     @Test
     public void getClientByClientId() {
         var client = Client.builder().clientId(ID).build();
-        when(clientService.getClientByClientId(any())).thenReturn(client);
+        when(clientService.getClientByClientId(any())).thenReturn(Mono.just(client));
 
-        ResponseEntity<Client> response = clientController.getClientByClientId(ID);
+        ResponseEntity<Mono<Client>> response = clientController.getClientByClientId(ID);
         assertThat(response.getStatusCode()).isSameAs(HttpStatus.OK);
-        assertThat(Objects.requireNonNull(response.getBody().getClientId())).isEqualTo(ID);
+        assertThat(Objects.requireNonNull(response.getBody().map(Client::getClientId))).isEqualTo(ID);
         verify(clientService).getClientByClientId(ID);
     }
 

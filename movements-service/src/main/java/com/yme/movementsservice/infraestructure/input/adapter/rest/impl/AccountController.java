@@ -1,11 +1,19 @@
 package com.yme.movementsservice.infraestructure.input.adapter.rest.impl;
 
-import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Account;
 import com.yme.movementsservice.application.input.port.AccountService;
+import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Account;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -24,7 +32,7 @@ public class AccountController {
      * @return HttpStatus.CREATED and body with object account
      */
     @PostMapping("{clientId}")
-    public ResponseEntity<Account> saveAccount(@PathVariable("clientId") Long clientId, @RequestBody Account account){
+    public ResponseEntity<Mono<Account>> saveAccount(@PathVariable("clientId") Long clientId, @RequestBody Account account){
         return new ResponseEntity<>(accountService.saveAccount(clientId, account), HttpStatus.CREATED);
     }
 
@@ -36,7 +44,7 @@ public class AccountController {
      * @return HttpStatus.OK and body with object account
      */
     @PutMapping("{clientId}")
-    public ResponseEntity<Account> updateAccount(@PathVariable("clientId") Long clientId, @RequestBody Account account){
+    public ResponseEntity<Mono<Account>> updateAccount(@PathVariable("clientId") Long clientId, @RequestBody Account account){
         return ResponseEntity.ok(accountService.updateAccount(clientId, account));
     }
 
@@ -46,7 +54,7 @@ public class AccountController {
      * @return HttpStatus.OK and body with a list of accounts
      */
     @GetMapping
-    public ResponseEntity<List<Account>> getAllAccounts(){
+    public ResponseEntity<Mono<List<Account>>> getAllAccounts(){
         return ResponseEntity.ok(accountService.getAllAccounts());
     }
 
@@ -57,7 +65,7 @@ public class AccountController {
      * @return HttpStatus.OK and body with an account
      */
     @GetMapping("{accountNumber}")
-    public ResponseEntity<Account> getAccountByAccountNumber(@PathVariable("accountNumber") String accountNumber){
+    public ResponseEntity<Mono<Account>> getAccountByAccountNumber(@PathVariable("accountNumber") String accountNumber){
         return ResponseEntity.ok(accountService.getAccountByAccountNumber(accountNumber));
     }
 
@@ -68,7 +76,7 @@ public class AccountController {
      * @return HttpStatus.OK and body with a Boolean value.
      */
     @DeleteMapping("{accountNumber}")
-    public ResponseEntity<Boolean> deleteAccountByAccountNumber(@PathVariable("accountNumber") String accountNumber){
+    public ResponseEntity<Mono<Boolean>> deleteAccountByAccountNumber(@PathVariable("accountNumber") String accountNumber){
         return ResponseEntity.ok(accountService.deleteAccountByAccountNumber(accountNumber));
     }
 }

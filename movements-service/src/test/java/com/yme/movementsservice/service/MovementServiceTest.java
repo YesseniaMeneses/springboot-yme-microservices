@@ -5,19 +5,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yme.movementsservice.BaseTest;
 import com.yme.movementsservice.application.input.port.AccountService;
 import com.yme.movementsservice.application.input.port.MovementService;
-import com.yme.movementsservice.infraestructure.util.Constant;
-import com.yme.movementsservice.infraestructure.util.ErrorMessages;
-import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Account;
-import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Client;
-import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Movement;
 import com.yme.movementsservice.infraestructure.input.adapter.rest.exception.BusinessException;
 import com.yme.movementsservice.infraestructure.input.adapter.rest.exception.ResourceNotFoundException;
 import com.yme.movementsservice.infraestructure.output.adapter.repository.ClientRepository;
+import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Account;
+import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Client;
+import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Movement;
+import com.yme.movementsservice.infraestructure.util.Constant;
+import com.yme.movementsservice.infraestructure.util.ErrorMessages;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -62,7 +63,7 @@ class MovementServiceTest extends BaseTest {
 
     private void saveAccount() {
         clientRepository.save(client);
-        Account savedAccount = accountService.saveAccount(CLIENT_ID, account);
+        Mono<Account> savedAccount = accountService.saveAccount(CLIENT_ID, account);
         Assertions.assertNotNull(savedAccount);
     }
 
@@ -88,14 +89,14 @@ class MovementServiceTest extends BaseTest {
         movement = saveMovement(ACCOUNT_NUMBER, Constant.DEPOSIT_KEY, BigDecimal.valueOf(500.29));
         Assertions.assertEquals(BigDecimal.valueOf(559.72), movement.getAvailableBalance());
 
-        Account account = accountService.getAccountByAccountNumber(ACCOUNT_NUMBER);
-        Assertions.assertEquals(BigDecimal.valueOf(559.72), account.getFinalBalance());
+        Mono<Account> account = accountService.getAccountByAccountNumber(ACCOUNT_NUMBER);
+        Assertions.assertEquals(BigDecimal.valueOf(559.72), account.map(Account::getFinalBalance));
 
         movement = saveMovement(ACCOUNT_NUMBER, Constant.WITHDRAWAL_KEY, BigDecimal.valueOf(559.72));
         Assertions.assertEquals(0, BigDecimal.ZERO.compareTo(movement.getAvailableBalance()));
 
         account = accountService.getAccountByAccountNumber(ACCOUNT_NUMBER);
-        Assertions.assertEquals(0, BigDecimal.ZERO.compareTo(account.getFinalBalance()));
+        Assertions.assertEquals(0, BigDecimal.ZERO.compareTo(account.map(Account::getFinalBalance).block()));
     }
 
     @Transactional

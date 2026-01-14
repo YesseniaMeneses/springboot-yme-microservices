@@ -1,18 +1,16 @@
 package com.yme.movementsservice.application.service;
 
-import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Client;
-import com.yme.movementsservice.infraestructure.util.ErrorMessages;
-import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Account;
-import com.yme.movementsservice.infraestructure.input.adapter.rest.exception.ResourceAlreadyExistsException;
+import com.yme.movementsservice.application.input.port.AccountService;
 import com.yme.movementsservice.infraestructure.input.adapter.rest.exception.ResourceNotFoundException;
 import com.yme.movementsservice.infraestructure.output.adapter.repository.AccountRepository;
 import com.yme.movementsservice.infraestructure.output.adapter.repository.ClientRepository;
-import com.yme.movementsservice.application.input.port.AccountService;
+import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Account;
+import com.yme.movementsservice.infraestructure.util.ErrorMessages;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Service methods for Account.
@@ -32,17 +30,15 @@ public class AccountServiceImpl implements AccountService {
      * @return an account object.
      */
     @Override
-    public Account saveAccount(Long clientId, Account account) {
-        if (!Objects.isNull(accountRepository.findByAccountNumber(account.getAccountNumber())))
-            throw new ResourceAlreadyExistsException(ErrorMessages.ERROR_ACCOUNT_ALREADY_EXISTS);
-
-        Client client = clientRepository.findByClientId(clientId);
-        if (Objects.isNull(client))
-            throw new ResourceNotFoundException(ErrorMessages.ERROR_CLIENT_NOT_FOUND);
-
-        account.setClient(client);
-        account.setFinalBalance(account.getInitialBalance());
-        return accountRepository.save(account);
+    public Mono<Account> saveAccount(Long clientId, Account account) {
+        return Mono.just(clientRepository.findByClientId(clientId))
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException(ErrorMessages.ERROR_CLIENT_NOT_FOUND)))
+                .map(client -> {
+                    account.setClient(client);
+                    account.setFinalBalance(account.getInitialBalance());
+                    return account;
+                })
+                .map(accountRepository::save);
     }
 
     /**
@@ -53,11 +49,11 @@ public class AccountServiceImpl implements AccountService {
      * @return an updated account object.
      */
     @Override
-    public Account updateAccount(Long clientId, Account account) {
-        Client client = clientRepository.findByClientId(clientId);
-        if (Objects.isNull(client))
-            throw new ResourceNotFoundException(ErrorMessages.ERROR_CLIENT_NOT_FOUND);
-        return accountRepository.save(account);
+    public Mono<Account> updateAccount(Long clientId, Account account) {
+        return Mono.just(clientRepository.findByClientId(clientId))
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException(ErrorMessages.ERROR_CLIENT_NOT_FOUND)))
+                .map(client -> account)
+                .map(accountRepository::save);
     }
 
     /**
@@ -66,8 +62,8 @@ public class AccountServiceImpl implements AccountService {
      * @return a list of accounts.
      */
     @Override
-    public List<Account> getAllAccounts() {
-        return accountRepository.findAll();
+    public Mono<List<Account>> getAllAccounts() {
+        return Mono.just(accountRepository.findAll());
     }
 
     /**
@@ -77,11 +73,10 @@ public class AccountServiceImpl implements AccountService {
      * @return an account.
      */
     @Override
-    public Account getAccountByAccountNumber(String accountNumber) {
-        Account account = accountRepository.findByAccountNumber(accountNumber);
-        if (Objects.isNull(account))
-            throw new ResourceNotFoundException(ErrorMessages.ERROR_ACCOUNT_NOT_FOUND);
-       return account;
+    public Mono<Account> getAccountByAccountNumber(String accountNumber) {
+        return Mono.just(accountRepository.findByAccountNumber(accountNumber))
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException(ErrorMessages.ERROR_ACCOUNT_NOT_FOUND)))
+                .map(account -> account);
     }
 
     /**
@@ -91,9 +86,11 @@ public class AccountServiceImpl implements AccountService {
      * @return a Boolean value.
      */
     @Override
-    public Boolean deleteAccountByAccountNumber(String accountNumber) {
-        Account account = getAccountByAccountNumber(accountNumber);
-        accountRepository.deleteById(account.getId());
-        return true;
+    public Mono<Boolean> deleteAccountByAccountNumber(String accountNumber) {
+        return getAccountByAccountNumber(accountNumber)
+                .map(account -> {
+                    accountRepository.deleteById(account.getId());
+                    return Boolean.TRUE;
+                });
     }
 }
