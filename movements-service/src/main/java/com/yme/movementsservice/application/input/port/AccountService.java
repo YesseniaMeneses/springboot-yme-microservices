@@ -1,6 +1,7 @@
 package com.yme.movementsservice.application.input.port;
 
 import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Account;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface AccountService {
      * @param account
      * @return an account object.
      */
-    Account saveAccount(Long clientId, Account account);
+    Mono<Account> saveAccount(Long clientId, Account account);
 
     /**
      * Update an account.
@@ -24,14 +25,14 @@ public interface AccountService {
      * @param account
      * @return an updated account.
      */
-    Account updateAccount(Long clientId, Account account);
+    Mono<Account> updateAccount(Long clientId, Account account);
 
     /**
      * Get all existing accounts.
      *
      * @return a list of accounts.
      */
-    List<Account> getAllAccounts();
+    Mono<List<Account>> getAllAccounts();
 
     /**
      * Get an account by accountNumber.
@@ -39,7 +40,7 @@ public interface AccountService {
      * @param accountNumber
      * @return an account object.
      */
-    Account getAccountByAccountNumber(String accountNumber);
+    Mono<Account> getAccountByAccountNumber(String accountNumber);
 
     /**
      * Delete an account.
@@ -47,5 +48,5 @@ public interface AccountService {
      * @param accountNumber
      * @return a Boolean value.
      */
-    Boolean deleteAccountByAccountNumber(String accountNumber);
+    Mono<Boolean> deleteAccountByAccountNumber(String accountNumber);
 }

@@ -2,6 +2,7 @@ package com.yme.clientservice.application.input.port;
 
 
 import com.yme.clientservice.domain.Client;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public interface ClientService {
      * @param client
      * @return a client.
      */
-    Client saveClient(Client client);
+    Mono<Client> saveClient(Client client);
 
     /**
      * Update a client.
@@ -24,14 +25,14 @@ public interface ClientService {
      * @param client
      * @return an updated client.
      */
-    Client updateClient(Client client);
+    Mono<Client> updateClient(Client client);
 
     /**
      * Get all clients.
      *
      * @return a list of clients.
      */
-    List<Client> getAllClients();
+    Mono<List<Client>> getAllClients();
 
     /**
      * Search a client by clientId.
@@ -39,7 +40,7 @@ public interface ClientService {
      * @param clientId
      * @return a client.
      */
-    Client getClientByClientId(Long clientId);
+    Mono<Client> getClientByClientId(Long clientId);
 
     /**
      * Delete a client.
@@ -47,5 +48,5 @@ public interface ClientService {
      * @param clientId
      * @return Boolean value.
      */
-    Boolean deleteClientByClientId(Long clientId);
+    Mono<Boolean> deleteClientByClientId(Long clientId);
 }

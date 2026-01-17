@@ -6,21 +6,22 @@ import com.yme.movementsservice.BaseTest;
 import com.yme.movementsservice.application.input.port.AccountService;
 import com.yme.movementsservice.application.input.port.MovementService;
 import com.yme.movementsservice.application.input.port.ReportService;
-import com.yme.movementsservice.infraestructure.util.Constant;
-import com.yme.movementsservice.infraestructure.util.ErrorMessages;
+import com.yme.movementsservice.domain.MovementDetail;
+import com.yme.movementsservice.domain.MovementsByAccount;
+import com.yme.movementsservice.domain.enums.AccountType;
+import com.yme.movementsservice.infraestructure.input.adapter.rest.exception.BusinessException;
+import com.yme.movementsservice.infraestructure.output.adapter.repository.ClientRepository;
 import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Account;
 import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Client;
 import com.yme.movementsservice.infraestructure.output.adapter.repository.entity.Movement;
-import com.yme.movementsservice.domain.enums.AccountType;
-import com.yme.movementsservice.infraestructure.input.adapter.rest.exception.BusinessException;
-import com.yme.movementsservice.domain.MovementDetail;
-import com.yme.movementsservice.domain.MovementsByAccount;
-import com.yme.movementsservice.infraestructure.output.adapter.repository.ClientRepository;
+import com.yme.movementsservice.infraestructure.util.Constant;
+import com.yme.movementsservice.infraestructure.util.ErrorMessages;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -66,7 +67,7 @@ class ReportServiceTest extends BaseTest {
         Account account = new Account();
         account.setAccountType(AccountType.AHO);
         account.setAccountNumber(accountNumber);
-        Account savedAccount = accountService.saveAccount(CLIENT_ID, account);
+        Mono<Account> savedAccount = accountService.saveAccount(CLIENT_ID, account);
         Assertions.assertNotNull(savedAccount);
     }
 
