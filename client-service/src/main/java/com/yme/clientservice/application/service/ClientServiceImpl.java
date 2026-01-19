@@ -83,7 +83,7 @@ public class ClientServiceImpl implements ClientService {
     public Mono<Boolean> deleteClientByClientId(Long clientId) {
         return getClientByClientId(clientId)
                 .map(clientMapper::toClientEntity)
-                .flatMap(clientEntity -> clientRepository.deleteById(clientEntity.getId()))
+                .map(clientEntity -> clientRepository.deleteById(clientEntity.getId()))
                 .map(a -> Boolean.TRUE);
     }
 }

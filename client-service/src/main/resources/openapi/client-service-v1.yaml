@@ -1,0 +1,224 @@
+openapi: 3.0.3
+info:
+  title: Client Service API
+  description: >
+    API contract-first para la gestión de clientes y envío asíncrono a cola.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8888/v1
+    description: Local
+
+tags:
+  - name: Clients
+    description: Operaciones CRUD de clientes
+  - name: AsyncClients
+    description: Envío asíncrono de clientes a RabbitMQ
+
+paths:
+
+  /clientes:
+    post:
+      tags: [Clients]
+      summary: Crear un cliente
+      description: Inserta un cliente en la base de datos.
+      operationId: createClient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Client'
+      responses:
+        '201':
+          description: Cliente creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+        '409':
+          description: Cliente ya existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags: [Clients]
+      summary: Actualizar cliente
+      description: Actualiza un cliente existente.
+      operationId: updateClient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Client'
+      responses:
+        '200':
+          description: Cliente actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+        '404':
+          description: Cliente no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      tags: [Clients]
+      summary: Obtener todos los clientes
+      description: Retorna la lista completa de clientes.
+      operationId: getAllClients
+      responses:
+        '200':
+          description: Lista de clientes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Client'
+
+  /clientes/{clientId}:
+    get:
+      tags: [Clients]
+      summary: Obtener cliente por clientId
+      operationId: getClientByClientId
+      parameters:
+        - name: clientId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Cliente encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+        '404':
+          description: Cliente no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags: [Clients]
+      summary: Eliminar cliente
+      description: Elimina un cliente por clientId.
+      operationId: deleteClientByClientId
+      parameters:
+        - name: clientId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Cliente eliminado
+          content:
+            application/json:
+              schema:
+                type: boolean
+        '404':
+          description: Cliente no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /async/clientes:
+    post:
+      tags: [AsyncClients]
+      summary: Enviar cliente a cola
+      description: Envía un cliente de forma asíncrona a RabbitMQ.
+      operationId: sendAsyncClient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AsyncClient'
+      responses:
+        '200':
+          description: Cliente enviado a la cola
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Cliente enviado
+
+components:
+
+  schemas:
+
+    Client:
+      type: object
+      required:
+        - clientId
+        - identification
+        - name
+        - gender
+        - age
+        - address
+        - phoneNumber
+      properties:
+        clientId:
+          type: integer
+          format: int64
+        password:
+          type: string
+          format: password
+        identification:
+          type: string
+        name:
+          type: string
+        gender:
+          type: string
+        age:
+          type: integer
+          minimum: 1
+        address:
+          type: string
+        phoneNumber:
+          type: string
+        status:
+          type: boolean
+
+    AsyncClient:
+      type: object
+      properties:
+        identification:
+          type: string
+        name:
+          type: string
+        gender:
+          type: string
+        age:
+          type: integer
+        address:
+          type: string
+        phoneNumber:
+          type: string
+        clientId:
+          type: integer
+          format: int64
+        password:
+          type: string
+        status:
+          type: boolean
+
+    ErrorResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+        message:
+          type: string

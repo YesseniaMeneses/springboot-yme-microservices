@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/clientes")
+@RequestMapping("v1/clientes")
 @AllArgsConstructor
 public class ClientController {
 
