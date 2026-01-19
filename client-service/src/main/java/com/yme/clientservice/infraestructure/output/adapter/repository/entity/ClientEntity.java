@@ -1,7 +1,6 @@
 package com.yme.clientservice.infraestructure.output.adapter.repository.entity;
 
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,7 +22,7 @@ import org.springframework.data.relational.core.mapping.Table;
 public class ClientEntity extends Person {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
     @Column
     private Long clientId;

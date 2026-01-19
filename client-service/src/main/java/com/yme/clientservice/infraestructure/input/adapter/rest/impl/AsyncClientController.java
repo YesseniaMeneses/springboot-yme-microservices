@@ -29,6 +29,6 @@ public class AsyncClientController {
     @PostMapping
     public ResponseEntity<String> saveClient(@RequestBody AsyncClient client){
         queueService.sendMessage(client);
-        return ResponseEntity.ok("Cliente enviado");
+        return ResponseEntity.ok("Client sent!");
     }
 }

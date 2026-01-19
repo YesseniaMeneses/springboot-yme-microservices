@@ -2,7 +2,7 @@ package com.yme.clientservice;
 
 import org.junit.jupiter.api.Test;
 
-class ClientServiceApplicationTests extends BaseTest{
+class ClientServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
