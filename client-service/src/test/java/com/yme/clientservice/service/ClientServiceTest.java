@@ -2,87 +2,118 @@ package com.yme.clientservice.service;
 
 import com.yme.clientservice.application.service.ClientServiceImpl;
 import com.yme.clientservice.domain.Client;
+import com.yme.clientservice.infraestructure.input.adapter.rest.exception.ResourceNotFoundException;
 import com.yme.clientservice.infraestructure.output.adapter.mapper.ClientMapper;
 import com.yme.clientservice.infraestructure.output.adapter.repository.ClientRepository;
 import com.yme.clientservice.infraestructure.output.adapter.repository.entity.ClientEntity;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ClientServiceTest {
+@ExtendWith(MockitoExtension.class)
+class ClientServiceTest {
 
-    @InjectMocks private ClientServiceImpl clientService;
-    @Mock private ClientRepository clientRepository;
-    @Mock private ClientMapper clientMapper;
+    @Mock
+    private ClientRepository clientRepository;
+    @Mock
+    private ClientMapper clientMapper;
+    @InjectMocks
+    private ClientServiceImpl clientService;
 
     private static final Long ID = 123L;
+    private static ClientEntity clientEntity;
+    private static Client client;
+
+    @BeforeEach
+    void setUp() {
+        clientEntity = ClientEntity.builder().clientId(ID).build();
+        client = Client.builder().clientId(ID).build();
+    }
 
     @Test
-    public void saveClient() {
-        var clientEntity = ClientEntity.builder().clientId(ID).build();
-        var client = Client.builder().clientId(ID).build();
-
-        when(clientRepository.save(any(ClientEntity.class))).thenReturn(clientEntity);
-        when(clientMapper.toClient(any(ClientEntity.class))).thenReturn(client);
+    void saveClient() {
         when(clientMapper.toClientEntity(any(Client.class))).thenReturn(clientEntity);
+        when(clientRepository.save(any(ClientEntity.class))).thenReturn(Mono.just(clientEntity));
+        when(clientMapper.toClient(any(ClientEntity.class))).thenReturn(client);
 
-        Client savedClientEntity = clientService.saveClient(client);
-        assertThat(savedClientEntity.getClientId()).isSameAs(clientEntity.getClientId());
+        StepVerifier.create(clientService.saveClient(client))
+                .expectNext(client)
+                .verifyComplete();
+
         verify(clientRepository).save(clientEntity);
     }
 
     @Test
-    public void updateClient() {
-        var clientEntity = ClientEntity.builder().clientId(ID).status(false).build();
-        var client = Client.builder().clientId(ID).status(false).build();
-
-        when(clientRepository.save(any(ClientEntity.class))).thenReturn(clientEntity);
+    void updateClient() {
         when(clientMapper.toClient(any(ClientEntity.class))).thenReturn(client);
         when(clientMapper.toClientEntity(any(Client.class))).thenReturn(clientEntity);
+        when(clientRepository.findByClientId(any())).thenReturn(Mono.just(clientEntity));
+        when(clientRepository.save(any(ClientEntity.class))).thenReturn(Mono.just(clientEntity));
 
-        Client updatedClientEntity = clientService.updateClient(client);
-        assertThat(updatedClientEntity.getStatus()).isSameAs(Boolean.FALSE);
+        StepVerifier.create(clientService.updateClient(client))
+                .expectNext(client)
+                .verifyComplete();
+
+        verify(clientRepository).findByClientId(ID);
+        verify(clientRepository).save(clientEntity);
     }
 
     @Test
-    public void getAllClients() {
-        List<ClientEntity> clientEntities = new ArrayList<>();
-        clientEntities.add(new ClientEntity());
+    void getAllClients() {
+        when(clientRepository.findAll()).thenReturn(Flux.just(clientEntity));
+        when(clientMapper.toClient(any(ClientEntity.class))).thenReturn(client);
 
-        when(clientRepository.findAll()).thenReturn(clientEntities);
+        StepVerifier.create(clientService.getAllClients())
+                .expectNextMatches(list ->
+                        list.size() == 1 &&
+                        list.get(0).getClientId().equals(ID))
+                .verifyComplete();
 
-        List<Client> clientList = clientService.getAllClients();
-        assertThat(clientList.size()).isEqualTo(1);
         verify(clientRepository).findAll();
     }
 
     @Test
-    public void getClientByClientId() {
-        var clientEntity = ClientEntity.builder().clientId(ID).build();
-        var client = Client.builder().clientId(ID).status(false).build();
-
-        when(clientRepository.findByClientId(any())).thenReturn(clientEntity);
+    void getClientByClientId() {
+        when(clientRepository.findByClientId(any())).thenReturn(Mono.just(clientEntity));
         when(clientMapper.toClient(any(ClientEntity.class))).thenReturn(client);
 
-        Client foundClientEntity = clientService.getClientByClientId(ID);
-        assertThat(foundClientEntity.getClientId()).isSameAs(clientEntity.getClientId());
+        StepVerifier.create(clientService.getClientByClientId(ID))
+                .expectNextMatches(client::equals)
+                .verifyComplete();
+
         verify(clientRepository).findByClientId(ID);
     }
 
     @Test
-    public void deleteClientByClientId() {
-        clientRepository.deleteById(ID);
-        verify(clientRepository).deleteById(ID);
+    void givenNoClientWhenGetClientByClientIdThenThrowException() {
+        when(clientRepository.findByClientId(any())).thenReturn(Mono.empty());
+
+        StepVerifier.create(clientService.getClientByClientId(ID))
+                .expectError(ResourceNotFoundException.class)
+                .verify();
+    }
+
+    @Test
+    void deleteClientByClientId() {
+        when(clientRepository.findByClientId(any())).thenReturn(Mono.just(clientEntity));
+        when(clientMapper.toClient(any(ClientEntity.class))).thenReturn(client);
+        when(clientMapper.toClientEntity(any(Client.class))).thenReturn(clientEntity);
+        when(clientRepository.deleteById(clientEntity.getId())).thenReturn(Mono.empty());
+
+        StepVerifier.create(clientService.deleteClientByClientId(ID))
+                .expectNext(Boolean.TRUE)
+                .verifyComplete();
+
+        verify(clientRepository).deleteById(clientEntity.getId());
     }
 }

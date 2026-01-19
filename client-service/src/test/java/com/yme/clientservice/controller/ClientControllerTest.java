@@ -3,81 +3,111 @@ package com.yme.clientservice.controller;
 import com.yme.clientservice.application.input.port.ClientService;
 import com.yme.clientservice.domain.Client;
 import com.yme.clientservice.infraestructure.input.adapter.rest.impl.ClientController;
-import com.yme.clientservice.infraestructure.output.adapter.mapper.ClientMapper;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import com.yme.clientservice.infraestructure.output.adapter.repository.entity.ClientEntity;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ClientControllerTest {
+@ExtendWith(MockitoExtension.class)
+class ClientControllerTest {
 
     @InjectMocks private ClientController clientController;
     @Mock private ClientService clientService;
-    @Mock private ClientMapper clientMapper;
 
     private static final Long ID = 123L;
+    private static ClientEntity clientEntity;
+    private static Client client;
+
+    @BeforeEach
+    void setUp() {
+        clientEntity = ClientEntity.builder().clientId(ID).build();
+        client = Client.builder().clientId(ID).build();
+    }
 
     @Test
-    public void saveClient() {
-        var client = Client.builder().clientId(ID).build();
+    void saveClient() {
+        when(clientService.saveClient(any(Client.class))).thenReturn(Mono.just(client));
 
-        when(clientService.saveClient(any(Client.class))).thenReturn(client);
+        ResponseEntity<Mono<Client>> response = clientController.saveClient(client);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody()).isNotNull();
 
-        ResponseEntity<Client> response = clientController.saveClient(client);
-        assertThat(response.getStatusCode()).isSameAs(HttpStatus.CREATED);
-        assertThat(Objects.requireNonNull(response.getBody().getClientId())).isEqualTo(123L);
+        StepVerifier.create(response.getBody())
+                .expectNext(client)
+                .verifyComplete();
+
         verify(clientService).saveClient(client);
     }
 
     @Test
-    public void updateClient() {
-        var client = Client.builder().clientId(ID).build();
-        when(clientService.updateClient(any(Client.class))).thenReturn(client);
+    void updateClient() {
+        when(clientService.updateClient(any(Client.class))).thenReturn(Mono.just(client));
 
-        ResponseEntity<Client> response = clientController.updateClient(client);
-        assertThat(response.getStatusCode()).isSameAs(HttpStatus.OK);
-        assertThat(Objects.requireNonNull(response.getBody().getClientId())).isEqualTo(ID);
+        ResponseEntity<Mono<Client>> response = clientController.updateClient(client);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+
+        StepVerifier.create(response.getBody())
+                .expectNext(client)
+                .verifyComplete();
+
         verify(clientService).updateClient(client);
     }
 
     @Test
-    public void getAllClients() {
-        List<Client> clientEntities = new ArrayList<>();
-        when(clientService.getAllClients()).thenReturn(clientEntities);
+    void getAllClients() {
+        when(clientService.getAllClients()).thenReturn(Mono.just(List.of(client)));
 
-        ResponseEntity<List<Client>> response = clientController.getAllClients();
-        assertThat(response.getStatusCode()).isSameAs(HttpStatus.OK);
+        ResponseEntity<Mono<List<Client>>> response = clientController.getAllClients();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
+
+        StepVerifier.create(response.getBody())
+                .expectNext(List.of(client))
+                .verifyComplete();
+
         verify(clientService).getAllClients();
     }
 
     @Test
-    public void getClientByClientId() {
-        var client = Client.builder().clientId(ID).build();
-        when(clientService.getClientByClientId(any())).thenReturn(client);
+    void getClientByClientId() {
+        when(clientService.getClientByClientId(ID)).thenReturn(Mono.just(client));
 
-        ResponseEntity<Client> response = clientController.getClientByClientId(ID);
-        assertThat(response.getStatusCode()).isSameAs(HttpStatus.OK);
-        assertThat(Objects.requireNonNull(response.getBody().getClientId())).isEqualTo(ID);
+        ResponseEntity<Mono<Client>> response = clientController.getClientByClientId(ID);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+
+        StepVerifier.create(response.getBody())
+                .expectNext(client)
+                .verifyComplete();
+
         verify(clientService).getClientByClientId(ID);
     }
 
     @Test
-    public void deleteClientByClientId() {
-        clientController.deleteClientByClientId(ID);
+    void deleteClientByClientId() {
+        when(clientService.deleteClientByClientId(ID)).thenReturn(Mono.just(Boolean.TRUE));
+
+        ResponseEntity<Mono<Boolean>> response = clientController.deleteClientByClientId(ID);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+
         verify(clientService).deleteClientByClientId(ID);
     }
 }

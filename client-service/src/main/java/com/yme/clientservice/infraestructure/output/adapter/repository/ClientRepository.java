@@ -1,12 +1,15 @@
 package com.yme.clientservice.infraestructure.output.adapter.repository;
 
 import com.yme.clientservice.infraestructure.output.adapter.repository.entity.ClientEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Mono;
 
 /**
  * Repository for Client entity.
  */
-public interface ClientRepository extends JpaRepository<ClientEntity, Long> {
+@Repository
+public interface ClientRepository extends ReactiveCrudRepository<ClientEntity, Long> {
 
-    ClientEntity findByClientId(Long clientId);
+    Mono<ClientEntity> findByClientId(Long clientId);
 }

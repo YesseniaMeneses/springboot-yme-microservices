@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class ClientController {
      * @return HttpStatus.CREATED and body with object client
      */
     @PostMapping
-    public ResponseEntity<Client> saveClient(@RequestBody Client client){
+    public ResponseEntity<Mono<Client>> saveClient(@RequestBody Client client){
         return new ResponseEntity<>(clientService.saveClient(client), HttpStatus.CREATED);
     }
 
@@ -41,7 +42,7 @@ public class ClientController {
      * @return HttpStatus.OK and body with updated client
      */
     @PutMapping
-    public ResponseEntity<Client> updateClient(@RequestBody Client client){
+    public ResponseEntity<Mono<Client>> updateClient(@RequestBody Client client){
         return ResponseEntity.ok(clientService.updateClient(client));
     }
 
@@ -51,7 +52,7 @@ public class ClientController {
      * @return HttpStatus.OK and body with a list of clients
      */
     @GetMapping
-    public ResponseEntity<List<Client>> getAllClients(){
+    public ResponseEntity<Mono<List<Client>>> getAllClients(){
         return ResponseEntity.ok(clientService.getAllClients());
     }
 
@@ -62,7 +63,7 @@ public class ClientController {
      * @return HttpStatus.OK and body with client object
      */
     @GetMapping("{clientId}")
-    public ResponseEntity<Client> getClientByClientId(@PathVariable("clientId") Long clientId){
+    public ResponseEntity<Mono<Client>> getClientByClientId(@PathVariable("clientId") Long clientId){
         return ResponseEntity.ok(clientService.getClientByClientId(clientId));
     }
 
@@ -73,7 +74,7 @@ public class ClientController {
      * @return HttpStatus.OK and Boolean
      */
     @DeleteMapping("{clientId}")
-    public ResponseEntity<Boolean> deleteClientByClientId(@PathVariable("clientId") Long clientId){
+    public ResponseEntity<Mono<Boolean>> deleteClientByClientId(@PathVariable("clientId") Long clientId){
         return ResponseEntity.ok(clientService.deleteClientByClientId(clientId));
     }
 }
